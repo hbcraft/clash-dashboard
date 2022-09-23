@@ -13,7 +13,7 @@
     box-shadow: 2px 5px 20px -3px rgba($color-primary-dark, 0.2);
     transition: all 300ms ease;
     &.selected-proxy {
-        background-color: $color-primary-dark;
+        background: linear-gradient(135deg, #57befc, #2c8af8);
         .proxy-name {
             color: white;
         }
