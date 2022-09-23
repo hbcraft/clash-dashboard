@@ -12,6 +12,20 @@
     cursor: default;
     box-shadow: 2px 5px 20px -3px rgba($color-primary-dark, 0.2);
     transition: all 300ms ease;
+    &.selected-proxy {
+        background-color: $color-primary-dark;
+        .proxy-name {
+            color: white;
+        }
+        .proxy-delay {
+            color: rgba($color: white, $alpha: 0.8);
+        }
+
+        .proxy-udp {
+            color: rgba($color: white, $alpha: 0.8);
+            background-color: #ffffff40;
+        }
+    }
 
     .proxy-name {
         display: -webkit-box;
@@ -26,6 +40,10 @@
 
     .proxy-delay {
         font-size: 10px;
+        color: rgba($color: $color-primary-darken, $alpha: 0.8);
+    }
+
+    .proxy-udp {
         color: rgba($color: $color-primary-darken, $alpha: 0.8);
     }
 
