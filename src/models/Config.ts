@@ -8,111 +8,107 @@ import { Rule } from './Rule'
  * @see https://github.com/Dreamacro/clash#config
  */
 export interface Config {
+  general?: {
+    /**
+     * http proxy port
+     */
+    port?: number
 
-    general?: {
+    /**
+     * socks proxy port
+     */
+    socksPort?: number
 
-        /**
-         * http proxy port
-         */
-        port?: number
+    /**
+     * redir proxy port
+     */
+    redirPort?: number
 
-        /**
-         * socks proxy port
-         */
-        socksPort?: number
+    /**
+     * proxy is allow lan
+     */
+    allowLan?: boolean
 
-        /**
-         * redir proxy port
-         */
-        redirPort?: number
+    /**
+     * controller port
+     */
+    externalControllerPort?: string
 
-        /**
-         * proxy is allow lan
-         */
-        allowLan?: boolean
+    /**
+     * controller address
+     */
+    externalControllerAddr?: string
 
-        /**
-         * controller port
-         */
-        externalControllerPort?: string
+    /**
+     * controller secret
+     */
+    secret?: string
 
-        /**
-         * controller address
-         */
-        externalControllerAddr?: string
+    /**
+     * clash proxy mode
+     */
+    mode?: string
 
-        /**
-         * controller secret
-         */
-        secret?: string
+    /**
+     * clash tty log level
+     */
+    logLevel?: string
+  }
 
-        /**
-         * clash proxy mode
-         */
-        mode?: string
+  proxy?: Proxy[]
 
-        /**
-         * clash tty log level
-         */
-        logLevel?: string
-    }
+  proxyGroup?: ProxyGroup[]
 
-    proxy?: Proxy[]
-
-    proxyGroup?: ProxyGroup[]
-
-    rules?: Rule[]
-
+  rules?: Rule[]
 }
 
 export interface Data {
-    version?: string
+  version?: string
 
-    general: {
+  general: {
+    /**
+     * http proxy port
+     */
+    port?: number
 
-        /**
-         * http proxy port
-         */
-        port?: number
+    /**
+     * socks proxy port
+     */
+    socksPort?: number
 
-        /**
-         * socks proxy port
-         */
-        socksPort?: number
+    /**
+     * mixed porxy port
+     */
+    mixedPort?: number
 
-        /**
-         * mixed porxy port
-         */
-        mixedPort?: number
+    /**
+     * redir proxy port
+     */
+    redirPort?: number
 
-        /**
-         * redir proxy port
-         */
-        redirPort?: number
+    /**
+     * proxy is allow lan
+     */
+    allowLan: boolean
 
-        /**
-         * proxy is allow lan
-         */
-        allowLan: boolean
+    /**
+     * clash proxy mode
+     */
+    mode: 'script' | 'rule' | 'direct' | 'global'
 
-        /**
-         * clash proxy mode
-         */
-        mode: 'script' | 'rule' | 'direct' | 'global'
+    /**
+     * clash tty log level
+     */
+    logLevel?: string
+  }
 
-        /**
-         * clash tty log level
-         */
-        logLevel?: string
-    }
+  proxy?: API.Proxy[]
 
-    proxy?: API.Proxy[]
+  proxyGroup?: API.Group[]
 
-    proxyGroup?: API.Group[]
+  proxyProviders?: API.Provider[]
 
-    proxyProviders?: API.Provider[]
+  rules?: API.Rule[]
 
-    rules?: API.Rule[]
-
-    proxyMap?: Map<string, API.Proxy>
+  proxyMap?: Map<string, API.Proxy>
 }

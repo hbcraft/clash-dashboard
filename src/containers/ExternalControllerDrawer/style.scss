@@ -1,14 +1,14 @@
 .external-controller {
-    .alert {
-        margin: 10px 0;
-    }
+  .alert {
+    margin: 10px 0;
+  }
 }
 
 @media (max-width: 768px) {
-    .external-controller {
-        // hack <Alert />
-        .alert {
-            display: none;
-        }
+  .external-controller {
+    // hack <Alert />
+    .alert {
+      display: none;
     }
+  }
 }

@@ -3,104 +3,121 @@
  */
 
 export const ProxyType = {
-    Shadowsocks: 'ss',
-    Vmess: 'vmess',
-    Socks5: 'socks5',
+  Shadowsocks: 'ss',
+  Vmess: 'vmess',
+  Socks5: 'socks5',
 }
 
 export type Proxy = ShadowsocksProxy & VmessProxy & Socks5Proxy
 
 export const SsProxyConfigList = [
-    'name', 'type', 'server', 'port', 'cipher', 'password', 'obfs', 'obfs-host',
+  'name',
+  'type',
+  'server',
+  'port',
+  'cipher',
+  'password',
+  'obfs',
+  'obfs-host',
 ]
 export interface ShadowsocksProxy {
-    name?: string
+  name?: string
 
-    type?: 'ss'
+  type?: 'ss'
 
-    server?: string
+  server?: string
 
-    port?: number
+  port?: number
 
-    cipher?: string
+  cipher?: string
 
-    password?: string
+  password?: string
 
-    obfs?: string
+  obfs?: string
 
-    'obfs-host'?: string
+  'obfs-host'?: string
 }
 
 export const VmessProxyConfigList = [
-    'name', 'type', 'server', 'port', 'uuid', 'alterid', 'cipher', 'tls',
+  'name',
+  'type',
+  'server',
+  'port',
+  'uuid',
+  'alterid',
+  'cipher',
+  'tls',
 ]
 export interface VmessProxy {
-    name?: string
+  name?: string
 
-    type?: 'vmess'
+  type?: 'vmess'
 
-    server?: string
+  server?: string
 
-    port?: number
+  port?: number
 
-    uuid?: string
+  uuid?: string
 
-    alterId?: number
+  alterId?: number
 
-    cipher?: string
+  cipher?: string
 
-    tls?: boolean
+  tls?: boolean
 }
 
 export const Socks5ProxyConfigList = ['name', 'type', 'server', 'port']
 export interface Socks5Proxy {
-    name?: string
+  name?: string
 
-    type?: 'socks5'
+  type?: 'socks5'
 
-    server?: string
+  server?: string
 
-    port?: number
+  port?: number
 }
 
-export type ProxyGroup = SelectProxyGroup & UrlTestProxyGroup & FallbackProxyGroup & LoadBalanceGroup
+export type ProxyGroup = SelectProxyGroup &
+  UrlTestProxyGroup &
+  FallbackProxyGroup &
+  LoadBalanceGroup
 
 export interface SelectProxyGroup {
-    name?: string
+  name?: string
 
-    type?: 'select'
+  type?: 'select'
 
-    proxies?: string[] // proxy names
+  proxies?: string[] // proxy names
 }
 
 export interface LoadBalanceGroup {
-    name?: string
+  name?: string
 
-    type?: 'load-balance'
+  type?: 'load-balance'
 
-    proxies?: string[] // proxy names
+  proxies?: string[] // proxy names
 }
 
 export interface FallbackProxyGroup {
-    name?: string
+  name?: string
 
-    type?: 'fallback'
+  type?: 'fallback'
 
-    proxies?: string[] // proxy names
+  proxies?: string[] // proxy names
 
-    url?: string
+  url?: string
 
-    interval?: number // second
+  interval?: number // second
 }
 
 export interface UrlTestProxyGroup {
-    name?: string
+  name?: string
 
-    type?: 'url-test'
+  type?: 'url-test'
 
-    proxies?: string[] // proxy names
+  proxies?: string[] // proxy names
 
-    url?: string
+  url?: string
 
-    interval?: number // second
+  interval?: number // second
 }

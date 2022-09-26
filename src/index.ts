@@ -7,7 +7,7 @@ import renderApp from './render'
  * Will check if need setup jsbridge
  */
 if (isClashX()) {
-    setupJsBridge(() => renderApp())
+  setupJsBridge(() => renderApp())
 } else {
-    renderApp()
+  renderApp()
 }

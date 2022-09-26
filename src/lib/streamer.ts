@@ -2,81 +2,84 @@ import EventEmitter from 'eventemitter3'
 import { SetRequired } from 'type-fest'
 
 export interface Config {
-    bufferLength?: number
-    retryInterval?: number
+  bufferLength?: number
+  retryInterval?: number
 }
 
 export class StreamReader<T> {
-    protected EE = new EventEmitter()
+  protected EE = new EventEmitter()
 
-    protected config: SetRequired<Config, 'bufferLength' | 'retryInterval'>
+  protected config: SetRequired<Config, 'bufferLength' | 'retryInterval'>
 
-    protected innerBuffer: T[] = []
+  protected innerBuffer: T[] = []
 
-    protected url = ''
+  protected url = ''
 
-    protected connection: WebSocket | null = null
+  protected connection: WebSocket | null = null
 
-    constructor (config: Config) {
-        this.config = Object.assign(
-            {
-                bufferLength: 0,
-                retryInterval: 5000,
-            },
-            config,
-        )
+  constructor(config: Config) {
+    this.config = Object.assign(
+      {
+        bufferLength: 0,
+        retryInterval: 5000,
+      },
+      config
+    )
+  }
+
+  protected connectWebsocket() {
+    if (!this.url) {
+      return
     }
 
-    protected connectWebsocket () {
-        if (!this.url) {
-            return
+    const url = new URL(this.url)
+
+    this.connection = new WebSocket(url.toString())
+    this.connection.addEventListener('message', (msg) => {
+      const data = JSON.parse(msg.data)
+      this.EE.emit('data', [data])
+      if (this.config.bufferLength > 0) {
+        this.innerBuffer.push(data)
+        if (this.innerBuffer.length > this.config.bufferLength) {
+          this.innerBuffer.splice(
+            0,
+            this.innerBuffer.length - this.config.bufferLength
+          )
         }
+      }
+    })
 
-        const url = new URL(this.url)
+    this.connection.addEventListener('error', (err) => {
+      this.EE.emit('error', err)
+      this.connection?.close()
+      setTimeout(this.connectWebsocket, this.config.retryInterval)
+    })
+  }
 
-        this.connection = new WebSocket(url.toString())
-        this.connection.addEventListener('message', msg => {
-            const data = JSON.parse(msg.data)
-            this.EE.emit('data', [data])
-            if (this.config.bufferLength > 0) {
-                this.innerBuffer.push(data)
-                if (this.innerBuffer.length > this.config.bufferLength) {
-                    this.innerBuffer.splice(0, this.innerBuffer.length - this.config.bufferLength)
-                }
-            }
-        })
-
-        this.connection.addEventListener('error', err => {
-            this.EE.emit('error', err)
-            this.connection?.close()
-            setTimeout(this.connectWebsocket, this.config.retryInterval)
-        })
+  connect(url: string) {
+    if (this.url === url && this.connection) {
+      return
     }
+    this.url = url
+    this.connection?.close()
+    this.connectWebsocket()
+  }
 
-    connect (url: string) {
-        if (this.url === url && this.connection) {
-            return
-        }
-        this.url = url
-        this.connection?.close()
-        this.connectWebsocket()
-    }
+  subscribe(event: string, callback: (data: T[]) => void) {
+    this.EE.addListener(event, callback)
+  }
 
-    subscribe (event: string, callback: (data: T[]) => void) {
-        this.EE.addListener(event, callback)
-    }
+  unsubscribe(event: string, callback: (data: T[]) => void) {
+    this.EE.removeListener(event, callback)
+  }
 
-    unsubscribe (event: string, callback: (data: T[]) => void) {
-        this.EE.removeListener(event, callback)
-    }
+  buffer() {
+    return this.innerBuffer.slice()
+  }
 
-    buffer () {
-        return this.innerBuffer.slice()
-    }
-
-    destory () {
-        this.EE.removeAllListeners()
-        this.connection?.close()
-        this.connection = null
-    }
+  destory() {
+    this.EE.removeAllListeners()
+    this.connection?.close()
+    this.connection = null
+  }
 }

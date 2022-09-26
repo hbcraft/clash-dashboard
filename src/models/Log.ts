@@ -1,5 +1,5 @@
 export interface Log {
-    type: string
-    payload: string
-    time: Date
+  type: string
+  payload: string
+  time: Date
 }

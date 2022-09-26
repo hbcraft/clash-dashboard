@@ -2,6 +2,7 @@ extends:
   - standard-with-typescript
   - airbnb/hooks
   - plugin:@typescript-eslint/recommended
+  - prettier
 plugins:
   - tailwindcss
 parser: '@typescript-eslint/parser'
@@ -14,16 +15,17 @@ settings:
     typescript:
       alwaysTryTypes: true
 rules:
-  comma-dangle: [error, always-multiline]
-  import/order: [error, {
-    groups: [builtin, external, internal, [parent, sibling, index, object]],
-    newlines-between: always,
-    alphabetize: { order: asc }
-  }]
-  jsx-quotes: [error, prefer-double]
+  import/order:
+    [
+      error,
+      {
+        groups: [builtin, external, internal, [parent, sibling, index, object]],
+        newlines-between: always,
+        alphabetize: { order: asc },
+      },
+    ]
   'tailwindcss/classnames-order': warn
   'tailwindcss/no-contradicting-classname': error
-  '@typescript-eslint/indent': [error, 4]
   '@typescript-eslint/explicit-function-return-type': off
   '@typescript-eslint/restrict-template-expressions': off
   '@typescript-eslint/strict-boolean-expressions': off
@@ -33,4 +35,3 @@ rules:
   '@typescript-eslint/no-floating-promises': off
   '@typescript-eslint/no-invalid-void-type': off
   '@typescript-eslint/no-misused-promises': off
-  '@typescript-eslint/comma-dangle': [error, only-multiline]

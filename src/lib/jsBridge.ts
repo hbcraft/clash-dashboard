@@ -16,40 +16,41 @@
  * declare javascript bridge API
  */
 export interface JsBridgeAPI {
+  /**
+   * Register a javascript bridge event handle
+   */
+  registerHandler: <D, P>(
+    eventName: string,
+    callback?: (data: D, responseCallback: (param: P) => void) => void
+  ) => void
 
-    /**
-     * Register a javascript bridge event handle
-     */
-    registerHandler: <D, P>(eventName: string, callback?: (data: D, responseCallback: (param: P) => void) => void) => void
+  /**
+   * Call a native handle
+   */
+  callHandler: <T, D>(
+    handleName: string,
+    data?: D,
+    responseCallback?: (responseData: T) => void
+  ) => void
 
-    /**
-     * Call a native handle
-     */
-    callHandler: <T, D>(handleName: string, data?: D, responseCallback?: (responseData: T) => void) => void
-
-    /**
-     * Who knows
-     */
-    disableJavscriptAlertBoxSafetyTimeout: () => void
-
+  /**
+   * Who knows
+   */
+  disableJavscriptAlertBoxSafetyTimeout: () => void
 }
 
 declare global {
+  interface Window {
+    /**
+     * Global jsbridge instance
+     */
+    WebViewJavascriptBridge?: JsBridgeAPI | null
 
-    interface Window {
-
-        /**
-         * Global jsbridge instance
-         */
-        WebViewJavascriptBridge?: JsBridgeAPI | null
-
-        /**
-         * Global jsbridge init callback
-         */
-        WVJBCallbacks?: JsBridgeCallback[]
-
-    }
-
+    /**
+     * Global jsbridge init callback
+     */
+    WVJBCallbacks?: JsBridgeCallback[]
+  }
 }
 
 type JsBridgeCallback = (jsbridge: JsBridgeAPI | null) => void
@@ -57,8 +58,8 @@ type JsBridgeCallback = (jsbridge: JsBridgeAPI | null) => void
 /**
  * Check if perched in ClashX Runtime
  */
-export function isClashX () {
-    return navigator.userAgent === 'ClashX Runtime'
+export function isClashX() {
+  return navigator.userAgent === 'ClashX Runtime'
 }
 
 /**
@@ -70,111 +71,111 @@ export let jsBridge: JsBridge | null = null
  * JsBridge class
  */
 export class JsBridge {
-    instance: JsBridgeAPI | null = null
+  instance: JsBridgeAPI | null = null
 
-    constructor (callback: () => void) {
-        if (window.WebViewJavascriptBridge != null) {
-            this.instance = window.WebViewJavascriptBridge
-        }
-
-        // init jsbridge
-        this.initBridge(jsBridge => {
-            this.instance = jsBridge
-            callback()
-        })
+  constructor(callback: () => void) {
+    if (window.WebViewJavascriptBridge != null) {
+      this.instance = window.WebViewJavascriptBridge
     }
 
+    // init jsbridge
+    this.initBridge((jsBridge) => {
+      this.instance = jsBridge
+      callback()
+    })
+  }
+
+  /**
+   * setup a jsbridge before app render
+   * @param {Function} cb callback when jsbridge initialized
+   * @see https://github.com/marcuswestin/WebViewJavascriptBridge
+   */
+  private initBridge(callback: JsBridgeCallback) {
     /**
-     * setup a jsbridge before app render
-     * @param {Function} cb callback when jsbridge initialized
-     * @see https://github.com/marcuswestin/WebViewJavascriptBridge
+     * You need check if inClashX first
      */
-    private initBridge (callback: JsBridgeCallback) {
-        /**
-         * You need check if inClashX first
-         */
-        if (!isClashX()) {
-            return callback?.(null)
-        }
-
-        if (window.WebViewJavascriptBridge != null) {
-            return callback(window.WebViewJavascriptBridge)
-        }
-
-        // setup callback
-        if (window.WVJBCallbacks != null) {
-            return window.WVJBCallbacks.push(callback)
-        }
-
-        window.WVJBCallbacks = [callback]
-
-        const WVJBIframe = document.createElement('iframe')
-        WVJBIframe.style.display = 'none'
-        WVJBIframe.src = 'https://__bridge_loaded__'
-        document.documentElement.appendChild(WVJBIframe)
-        setTimeout(() => document.documentElement.removeChild(WVJBIframe), 0)
+    if (!isClashX()) {
+      return callback?.(null)
     }
 
-    public async callHandler<T, D = unknown> (handleName: string, data?: D) {
-        return await new Promise<T>((resolve) => {
-            this.instance?.callHandler(
-                handleName,
-                data,
-                resolve,
-            )
-        })
+    if (window.WebViewJavascriptBridge != null) {
+      return callback(window.WebViewJavascriptBridge)
     }
 
-    public async ping () {
-        return await this.callHandler('ping')
+    // setup callback
+    if (window.WVJBCallbacks != null) {
+      return window.WVJBCallbacks.push(callback)
     }
 
-    public async readConfigString () {
-        return await this.callHandler<string>('readConfigString')
-    }
+    window.WVJBCallbacks = [callback]
 
-    public async getPasteboard () {
-        return await this.callHandler<string>('getPasteboard')
-    }
+    const WVJBIframe = document.createElement('iframe')
+    WVJBIframe.style.display = 'none'
+    WVJBIframe.src = 'https://__bridge_loaded__'
+    document.documentElement.appendChild(WVJBIframe)
+    setTimeout(() => document.documentElement.removeChild(WVJBIframe), 0)
+  }
 
-    public async getAPIInfo () {
-        return await this.callHandler<{ host: string, port: string, secret: string }>('apiInfo')
-    }
+  public async callHandler<T, D = unknown>(handleName: string, data?: D) {
+    return await new Promise<T>((resolve) => {
+      this.instance?.callHandler(handleName, data, resolve)
+    })
+  }
 
-    public async setPasteboard (data: string) {
-        return await this.callHandler('setPasteboard', data)
-    }
+  public async ping() {
+    return await this.callHandler('ping')
+  }
 
-    public async writeConfigWithString (data: string) {
-        return await this.callHandler('writeConfigWithString', data)
-    }
+  public async readConfigString() {
+    return await this.callHandler<string>('readConfigString')
+  }
 
-    public async setSystemProxy (data: boolean) {
-        return await this.callHandler('setSystemProxy', data)
-    }
+  public async getPasteboard() {
+    return await this.callHandler<string>('getPasteboard')
+  }
 
-    public async getStartAtLogin () {
-        return await this.callHandler<boolean>('getStartAtLogin')
-    }
+  public async getAPIInfo() {
+    return await this.callHandler<{
+      host: string
+      port: string
+      secret: string
+    }>('apiInfo')
+  }
 
-    public async getProxyDelay (name: string) {
-        return await this.callHandler<number>('speedTest', name)
-    }
+  public async setPasteboard(data: string) {
+    return await this.callHandler('setPasteboard', data)
+  }
 
-    public async setStartAtLogin (data: boolean) {
-        return await this.callHandler<boolean>('setStartAtLogin', data)
-    }
+  public async writeConfigWithString(data: string) {
+    return await this.callHandler('writeConfigWithString', data)
+  }
 
-    public async isSystemProxySet () {
-        return await this.callHandler<boolean>('isSystemProxySet')
-    }
+  public async setSystemProxy(data: boolean) {
+    return await this.callHandler('setSystemProxy', data)
+  }
+
+  public async getStartAtLogin() {
+    return await this.callHandler<boolean>('getStartAtLogin')
+  }
+
+  public async getProxyDelay(name: string) {
+    return await this.callHandler<number>('speedTest', name)
+  }
+
+  public async setStartAtLogin(data: boolean) {
+    return await this.callHandler<boolean>('setStartAtLogin', data)
+  }
+
+  public async isSystemProxySet() {
+    return await this.callHandler<boolean>('isSystemProxySet')
+  }
 }
 
-export function setupJsBridge (callback: () => void) {
-    if (jsBridge != null) {
-        callback()
-        return
-    }
+export function setupJsBridge(callback: () => void) {
+  if (jsBridge != null) {
+    callback()
+    return
+  }
 
-    jsBridge = new JsBridge(callback)
+  jsBridge = new JsBridge(callback)
 }

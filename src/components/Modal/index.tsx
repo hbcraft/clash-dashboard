@@ -9,90 +9,94 @@ import { useI18n } from '@stores'
 import './style.scss'
 
 interface ModalProps extends BaseComponentProps {
-    // show modal
-    show?: boolean
+  // show modal
+  show?: boolean
 
-    // modal title
-    title: string
+  // modal title
+  title: string
 
-    // size
-    size?: 'small' | 'big'
+  // size
+  size?: 'small' | 'big'
 
-    // body className
-    bodyClassName?: string
+  // body className
+  bodyClassName?: string
 
-    // body style
-    bodyStyle?: React.CSSProperties
+  // body style
+  bodyStyle?: React.CSSProperties
 
-    // show footer
-    footer?: boolean
+  // show footer
+  footer?: boolean
 
-    // on click ok
-    onOk?: typeof noop
+  // on click ok
+  onOk?: typeof noop
 
-    // on click close
-    onClose?: typeof noop
+  // on click close
+  onClose?: typeof noop
 }
 
-export function Modal (props: ModalProps) {
-    const {
-        show = true,
-        title = 'Modal',
-        size = 'small',
-        footer = true,
-        onOk = noop,
-        onClose = noop,
-        bodyClassName,
-        bodyStyle,
-        className,
-        style,
-        children,
-    } = props
+export function Modal(props: ModalProps) {
+  const {
+    show = true,
+    title = 'Modal',
+    size = 'small',
+    footer = true,
+    onOk = noop,
+    onClose = noop,
+    bodyClassName,
+    bodyStyle,
+    className,
+    style,
+    children,
+  } = props
 
-    const { translation } = useI18n()
-    const { t } = translation('Modal')
+  const { translation } = useI18n()
+  const { t } = translation('Modal')
 
-    const portalRef = useRef<HTMLDivElement>(document.createElement('div'))
-    const maskRef = useRef<HTMLDivElement>(null)
+  const portalRef = useRef<HTMLDivElement>(document.createElement('div'))
+  const maskRef = useRef<HTMLDivElement>(null)
 
-    useLayoutEffect(() => {
-        const current = portalRef.current
-        document.body.appendChild(current)
-        return () => { document.body.removeChild(current) }
-    }, [])
-
-    function handleMaskMouseDown (e: MouseEvent) {
-        if (e.target === maskRef.current) {
-            onClose()
-        }
+  useLayoutEffect(() => {
+    const current = portalRef.current
+    document.body.appendChild(current)
+    return () => {
+      document.body.removeChild(current)
     }
+  }, [])
 
-    const modal = (
+  function handleMaskMouseDown(e: MouseEvent) {
+    if (e.target === maskRef.current) {
+      onClose()
+    }
+  }
+
+  const modal = (
+    <div
+      className={classnames('modal-mask', { 'modal-show': show })}
+      ref={maskRef}
+      onMouseDown={handleMaskMouseDown}
+    >
+      <div
+        className={classnames('modal', `modal-${size}`, className)}
+        style={style}
+      >
+        <div className="modal-title">{title}</div>
         <div
-            className={classnames('modal-mask', { 'modal-show': show })}
-            ref={maskRef}
-            onMouseDown={handleMaskMouseDown}
+          className={classnames('modal-body', bodyClassName)}
+          style={bodyStyle}
         >
-            <div
-                className={classnames('modal', `modal-${size}`, className)}
-                style={style}
-            >
-                <div className="modal-title">{title}</div>
-                <div
-                    className={classnames('modal-body', bodyClassName)}
-                    style={bodyStyle}
-                >{children}</div>
-                {
-                    footer && (
-                        <div className="footer">
-                            <Button onClick={() => onClose()}>{ t('cancel') }</Button>
-                            <Button type="primary" onClick={() => onOk()}>{ t('ok') }</Button>
-                        </div>
-                    )
-                }
-            </div>
+          {children}
         </div>
-    )
+        {footer && (
+          <div className="footer">
+            <Button onClick={() => onClose()}>{t('cancel')}</Button>
+            <Button type="primary" onClick={() => onOk()}>
+              {t('ok')}
+            </Button>
+          </div>
+        )}
+      </div>
+    </div>
+  )
 
-    return createPortal(modal, portalRef.current)
+  return createPortal(modal, portalRef.current)
 }
